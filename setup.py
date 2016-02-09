@@ -13,4 +13,5 @@ setup(name='lmfm',
       ext_modules=cythonize("lmfm.pyx"),
       include_dirs=[numpy.get_include()],
       author='mathewlee11',
-      author_email='mathewlee11@gmail.com')
+      author_email='mathewlee11@gmail.com',
+      url='https://github.com/mathewlee11/lmfm')
