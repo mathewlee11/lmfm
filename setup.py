@@ -1,9 +1,9 @@
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, Extension
 from Cython.Distutils import build_ext
 import numpy
 
 setup(author='mathewlee11',
-      version='0.4.1',
+      version='0.4.2',
       author_email='mathewlee11@gmail.com',
       name='lmfm',
       packages=['lmfm'],

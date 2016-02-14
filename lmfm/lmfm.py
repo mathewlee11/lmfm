@@ -126,11 +126,11 @@ class LMFM(BaseEstimator, RegressorMixin):
 
     @property
     def V(self):
-        return np.asarray(self.fm.V)
+        return np.asarray(self.fm._V)
 
     @property
     def w(self):
-        return np.asarray(self.fm.w)
+        return np.asarray(self.fm._w)
 
     def predict(self, X):
         """Predict using the factorization machine
