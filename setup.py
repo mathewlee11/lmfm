@@ -1,17 +1,13 @@
-import numpy
-from distutils.core import setup
-from Cython.Build import cythonize
+from setuptools import setup, find_packages, Extension
 from Cython.Distutils import build_ext
+import numpy
 
-
-# Or, if you use cythonize() to make the ext_modules list,
-# include_dirs can be passed to setup()
-
-setup(name='lmfm',
-      version='0.3',
-      cmdclass={'build_ext': build_ext},
-      ext_modules=cythonize("lmfm.pyx"),
-      include_dirs=[numpy.get_include()],
-      author='mathewlee11',
+setup(author='mathewlee11',
+      version='0.4.1',
       author_email='mathewlee11@gmail.com',
-      url='https://github.com/mathewlee11/lmfm')
+      name='lmfm',
+      packages=['lmfm'],
+      url='https://github.com/mathewlee11/lmfm',
+      cmdclass={'build_ext': build_ext},
+      ext_modules=[Extension("lmfm_fast", ["lmfm/lmfm_fast.pyx"],
+                   libraries=[], include_dirs=[numpy.get_include()])])

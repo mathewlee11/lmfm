@@ -1,3 +1,4 @@
 README
-lmfm.pyx
+lmfm/lmfm.py
+lmfm/lmfm.pyx
 setup.py
