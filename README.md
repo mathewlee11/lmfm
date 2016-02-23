@@ -1,4 +1,3 @@
-Make this have words
 #LMFM
 
 A factorisation machine written in cython, trained using Alternating Least Squares and sklearn compatible!
