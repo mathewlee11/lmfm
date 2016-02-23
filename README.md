@@ -5,7 +5,8 @@ A factorisation machine written in cython, trained using Alternating Least Squar
 
 #Installation
 ```pip install lmfm```
-Done!
+
+Done! You can also get the dev version with ```pip install git+git://github.com/mathewlee11/lmfm```
 Requires cython, numpy, scipy and sklearn.
 
 #Example
