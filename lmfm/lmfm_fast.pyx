@@ -313,7 +313,8 @@ cdef class FM(object):
             error = 0
             for i in range(self.n_samples):
                 error += e[i] * e[i]
-            print ("epoch %d" % (epoch+1)), sqrt(error/ n_samples)
+            if self.verbose:
+                print("epoch %d" % (epoch+1)), sqrt(error/ n_samples)
 
 
     def fit(self, X, y):

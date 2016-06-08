@@ -101,7 +101,6 @@ class LMFM(BaseEstimator, RegressorMixin):
         if type(X) == dok_matrix:
             raise TypeError('dok_matrix not supported')
         check_X_y(X, y, accept_sparse=['csr', 'csc'])
-        check_array(X)
 
         if self.min_target is None:
             min_target = -np.inf
