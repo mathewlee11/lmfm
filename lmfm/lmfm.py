@@ -30,17 +30,15 @@ class LMFMRegressor(BaseEstimator, RegressorMixin):
     w0 : double
         Initial global bias.
         Defaults to 0.0
-    lambda_w0 : double
-        regularization hyperparameter for w0
+    lambda_w : double
+        regularization hyperparameter for w
+        defaults to 0.0
+    lambda_v : double
+        regularization hyperparameter for v
         defaults to 0.0
     init_stdev : double, optional
         Standard deviation for initialization of 2-way factors.
         Defaults to 0.01.
-    learning_rate_schedule : string, optional
-        The learning rate:
-            constant: eta = eta0
-            optimal: eta = 1.0/(t+t0) [default]
-            invscaling: eta = eta0 / pow(t, power_t)
 
     shuffle: bool
         Whether or not to shuffle training dataset before learning
@@ -159,41 +157,16 @@ class LMFMClassifier(BaseEstimator, ClassifierMixin):
 
     n_factors : int
         The dimensionality of the factorized 2-way interactions
-    n_iters : int
+    n_iter : int
         Number of iterations
-    test_size: double
-        Percent of the training set to use for validation
-        Defaults to 0.01
     k0 : bool
         Use bias. Defaults to True.
     k1 : bool
         Use 1-way interactions (learn feature weights).
         Defaults to true.
-    w0 : double
-        Initial global bias.
-        Defaults to 0.0
-    lambda_w0 : double
-        regularization hyperparameter for w0
-        defaults to 0.0
     init_stdev : double, optional
         Standard deviation for initialization of 2-way factors.
         Defaults to 0.01.
-    learning_rate_schedule : string, optional
-        The learning rate:
-            constant: eta = eta0
-            optimal: eta = 1.0/(t+t0) [default]
-            invscaling: eta = eta0 / pow(t, power_t)
-
-    shuffle: bool
-        Whether or not to shuffle training dataset before learning
-
-    task : string
-        regression: Labels are real values.
-        classification: Labels are either positive or negative.
-    seed : int
-        The seed of the pseudo random number generator
-    verbose : bool
-        Whether or not to print current iteration, training error
 
 
     """
@@ -202,12 +175,7 @@ class LMFMClassifier(BaseEstimator, ClassifierMixin):
                  n_iter=3,
                  k0=True,
                  k1=True,
-                 lambda_w=0.0,
-                 lambda_v=0.0,
-                 shuffle=False,
                  init_stdev=0.01,
-                 seed=42,
-                 verbose=True,
                  learning_rate=0.01
                  ):
 
@@ -215,12 +183,7 @@ class LMFMClassifier(BaseEstimator, ClassifierMixin):
         self.n_iter = n_iter
         self.k0 = k0
         self.k1 = k1
-        self.lambda_w = lambda_w
-        self.lambda_v = lambda_v
-        self.shuffle = shuffle
         self.init_stdev = init_stdev
-        self.seed = seed
-        self.verbose = verbose
         self.learning_rate = learning_rate
 
     def fit(self, X, y):
@@ -243,14 +206,11 @@ class LMFMClassifier(BaseEstimator, ClassifierMixin):
             raise TypeError('dok_matrix not supported')
         check_X_y(X, y, accept_sparse=['csr', 'csc'])
 
-        verbose = int(self.verbose)
-        shuffle = int(self.shuffle)
         k0 = int(self.k0)
         k1 = int(self.k1)
         self.fm = FMClassifier(n_factors=self.n_factors, n_iter=self.n_iter,
-                               k0=k0, k1=k1, shuffle=shuffle,
-                               init_stdev=self.init_stdev, seed=self.seed,
-                               verbose=verbose,
+                               k0=k0, k1=k1,
+                               init_stdev=self.init_stdev,
                                learning_rate=self.learning_rate)
         self.fm.fit(X, y)
         return self

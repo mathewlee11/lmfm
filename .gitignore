@@ -1,0 +1,6 @@
+*.c
+*.so
+lmfm/__pycache__
+build/
+dist/
+lmfm.egg-info

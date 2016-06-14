@@ -31,17 +31,13 @@ cdef class FMClassifier(object):
 
 
     def __init__(self, int n_factors=10, int n_iter=3, int k0=1, int k1=1,
-                 int shuffle=0, double init_stdev=0.01, int seed=-1,
-                 int verbose=1, double learning_rate=0.001):
+                 double init_stdev=0.01, double learning_rate=0.001):
 
         self.n_factors = n_factors
         self.n_iter = n_iter
         self.k0 = k0
         self.k1 = k1
-        self.shuffle = shuffle
         self.init_stdev = init_stdev
-        self.seed = seed
-        self.verbose = verbose
         self.learning_rate = learning_rate
 
     cdef _predict_instance(self, int sample_ind):
