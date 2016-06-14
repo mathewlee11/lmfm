@@ -5,7 +5,6 @@
 
 
 from libc.math cimport exp, sqrt
-
 from libc.stdlib cimport malloc, free
 import numpy as np
 cimport numpy as np
@@ -15,8 +14,8 @@ np.import_array()
 
 
 __author__ = "mathewlee11"
-cdef class FM(object):
-    """def FM(self, int n_topics= 10, int n_iter=3, int k0=1, int k1=1,
+cdef class FMRegressor(object):
+    """def FM(self, int n_factors= 10, int n_iter=3, int k0=1, int k1=1,
     double w0=0, double lambda_w0=0, double lambda_w=0, double lambda_v=0,
     int min_target=0, int max_target=0, int shuffle=0, double init_stdev=0.01,
     int seed=42, int verbose=1)
@@ -27,7 +26,7 @@ cdef class FM(object):
     Parameters
     ----------
 
-    n_topics : int
+    n_factors : int
         The dimensionality of the factorized 2-way interactions
     n_iter : int
         Number of iterations
@@ -58,7 +57,7 @@ cdef class FM(object):
     """
     cdef:
 
-        int n_topics
+        int n_factors
         int n_iter
         int n_samples
         int n_features
@@ -83,7 +82,7 @@ cdef class FM(object):
 
 
     def __init__(self,
-                 int n_topics= 10,
+                 int n_factors= 10,
                  int n_iter=3,
                  int k0=1,
                  int k1=1,
@@ -94,10 +93,10 @@ cdef class FM(object):
                  int shuffle=0,
                  double init_stdev=0.01,
                  int seed=42,
-                 int verbose=1
+                 int verbose=1,
                 ):
 
-        self.n_topics = n_topics
+        self.n_factors = n_factors
         self.init_stdev = init_stdev
         self.n_iter = n_iter
         self.k0 = k0
@@ -109,7 +108,7 @@ cdef class FM(object):
         self.lambda_w = lambda_w
         self.lambda_v = lambda_v
 
-    cdef double _scale_prediction(self, double p) :
+    cdef double _scale_prediction(self, double p):
         p = _min(self.max_target, p)
         p = _max(self.min_target, p)
         return p
@@ -120,12 +119,12 @@ cdef class FM(object):
                           int start_index,
                           int end_index) :
 
-        cdef int n_topics = self.n_topics
-        cdef double * sum_ = <double *> malloc(n_topics * sizeof(double))
-        cdef double * sum_sqr_ = <double *> malloc(n_topics * sizeof(double))
+        cdef int n_factors = self.n_factors
+        cdef double * sum_ = <double *> malloc(n_factors * sizeof(double))
+        cdef double * sum_sqr_ = <double *> malloc(n_factors * sizeof(double))
         cdef Py_ssize_t i, latent_index
 
-        for i in range(n_topics):
+        for i in range(n_factors):
             sum_[i] = 0.0
             sum_sqr_[i] = 0.0
 
@@ -146,7 +145,7 @@ cdef class FM(object):
                 f_value = feature_values[i]
                 result += w[f_index] * f_value
 
-        for latent_index in range(n_topics):
+        for latent_index in range(n_factors):
             sum_[latent_index] = 0.0
             sum_sqr_[latent_index] = 0.0
 
@@ -168,7 +167,7 @@ cdef class FM(object):
                   int * indices,
                   double * data) :
 
-        cdef int n_topics = self.n_topics
+        cdef int n_factors = self.n_factors
         cdef int n_samples = self.n_samples
         cdef double result
         cdef double [:, :] q = self.q
@@ -181,7 +180,7 @@ cdef class FM(object):
 
             e[row] = self._predict_instance(indices, data, indptr[row], indptr[row+1]) - y[row]
 
-            for f in range(n_topics):
+            for f in range(n_factors):
 
                 result = 0.0
 
@@ -190,7 +189,7 @@ cdef class FM(object):
 
                 q[row, f] = result
 
-    cdef void _one_way_interactions(self,
+    cdef void _one_way_interactions_als(self,
                                int * col_indptr,
                                int * col_indices,
                                double * col_data) :
@@ -229,12 +228,26 @@ cdef class FM(object):
 
                 self.w[l] = w_l
 
-    cdef void _two_way_interactions(self,
+    cdef void _one_way_interactions_sgd(self, int * row_indptr,
+                                        int * row_indices, double * row_data):
+        cdef double [:] y = self.y
+        cdef int n_samples = self.n_samples
+        cdef int n_features = self.n_features
+        cdef double p
+        cdef int i
+
+        for i in range(n_samples):
+            target = y[i]
+            p = self._predict_instance(row_indices, row_data,
+                                       row_indptr[i], row_indptr[i+1])
+
+
+    cdef void _two_way_interactions_als(self,
                                int * col_indptr,
                                int * col_indices,
                                double * col_data) :
 
-        cdef int n_topics = self.n_topics
+        cdef int n_factors = self.n_factors
         cdef int n_features = self.n_features
         cdef int n_samples = self.n_samples
         cdef int row
@@ -244,7 +257,7 @@ cdef class FM(object):
         cdef double [:, :] q = self.q
         cdef double [:, :] V = self.V
         cdef double * e = self.e
-        for f in range(n_topics):
+        for f in range(n_factors):
             for l in range(n_features):
                 vlf = 0.0
                 den = 0.0
@@ -307,9 +320,9 @@ cdef class FM(object):
                 self.w0 = w0
 
             if self.k1:
-                self._one_way_interactions(col_indptr, col_indices, col_data)
+                self._one_way_interactions_als(col_indptr, col_indices, col_data)
 
-            self._two_way_interactions(col_indptr, col_indices, col_data)
+            self._two_way_interactions_als(col_indptr, col_indices, col_data)
             error = 0
             for i in range(self.n_samples):
                 error += e[i] * e[i]
@@ -336,10 +349,10 @@ cdef class FM(object):
         self.n_features = X.shape[1]
         self.w = np.zeros(self.n_features)
         np.random.seed(42)
-        self.V = np.random.normal(size=(self.n_topics, self.n_features),
+        self.V = np.random.normal(size=(self.n_factors, self.n_features),
                                   scale=self.init_stdev)
         self.e = <double *> malloc(self.n_samples * sizeof(double))
-        self.q = np.zeros((self.n_samples, self.n_topics))
+        self.q = np.zeros((self.n_samples, self.n_factors))
 
         self.y = y.astype(np.double)
         if X.dtype != np.double:

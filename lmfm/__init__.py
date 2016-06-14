@@ -1,3 +1,2 @@
 from __future__ import absolute_import
-from .lmfm import LMFM
-__all__ = ['LMFM']
+from .lmfm import LMFMRegressor, LMFMClassifier
