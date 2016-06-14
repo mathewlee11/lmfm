@@ -11,13 +11,13 @@ Requires cython, numpy, scipy and sklearn.
 #Example
 ```
 from sklearn.datasets import load_boston
-from lmfm import LMFM
+from lmfm import LMFMRegressor
 from sklearn.cross_validation import cross_val_predict
 d = load_boston()
 X = d.data
 y = d.target
 
-fm = LMFM(n_iter=100, verbose=0)
+fm = LMFMRegressor(n_iter=100)
 
 preds = cross_val_predict(fm, X, y)
 ```
