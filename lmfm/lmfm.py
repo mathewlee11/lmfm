@@ -176,7 +176,12 @@ class LMFMClassifier(BaseEstimator, ClassifierMixin):
                  k0=True,
                  k1=True,
                  init_stdev=0.01,
-                 learning_rate=0.01
+                 eta0=0.01,
+                 verbose=False,
+                 lambda_w=0.0,
+                 lambda_v=0.0,
+                 learning_rate_schedule='optimal',
+                 lambda_t=1.0
                  ):
 
         self.n_factors = n_factors
@@ -184,7 +189,12 @@ class LMFMClassifier(BaseEstimator, ClassifierMixin):
         self.k0 = k0
         self.k1 = k1
         self.init_stdev = init_stdev
-        self.learning_rate = learning_rate
+        self.eta0 = eta0
+        self.verbose = verbose
+        self.lambda_w = lambda_w
+        self.lambda_v = lambda_v
+        self.lambda_t = lambda_t
+        self.learning_rate_schedule = learning_rate_schedule
 
     def fit(self, X, y):
         """Fit factorization machine using Alternating Least Squares
@@ -208,10 +218,22 @@ class LMFMClassifier(BaseEstimator, ClassifierMixin):
 
         k0 = int(self.k0)
         k1 = int(self.k1)
+        verbose = int(self.verbose)
+        if self.learning_rate_schedule == 'optimal':
+            learning_rate_schedule = 0
+        else:
+            learning_rate_schedule = 1
+
         self.fm = FMClassifier(n_factors=self.n_factors, n_iter=self.n_iter,
                                k0=k0, k1=k1,
                                init_stdev=self.init_stdev,
-                               learning_rate=self.learning_rate)
+                               eta0=self.eta0,
+                               verbose=verbose,
+                               lambda_w=self.lambda_w,
+                               lambda_v=self.lambda_v,
+                               lambda_t=self.lambda_t,
+                               learning_rate_schedule=learning_rate_schedule,
+                               )
         self.fm.fit(X, y)
         return self
 

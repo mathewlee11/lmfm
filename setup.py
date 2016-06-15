@@ -3,7 +3,7 @@ from Cython.Distutils import build_ext
 import numpy
 
 setup(author='mathewlee11',
-      version='0.5.0',
+      version='0.6.0',
       author_email='mathewlee11@gmail.com',
       name='lmfm',
       packages=['lmfm'],

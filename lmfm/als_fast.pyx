@@ -41,11 +41,6 @@ cdef class FMRegressor(object):
     init_stdev : double, optional
         Standard deviation for initialization of 2-way factors.
         Defaults to 0.01.
-    learning_rate_schedule : string, optional
-        The learning rate:
-            constant: eta = eta0
-            optimal: eta = 1.0/(t+t0) [default]
-            invscaling: eta = eta0 / pow(t, power_t)
     shuffle: bool
         Whether or not to shuffle training dataset before learning
     seed : int
@@ -421,7 +416,6 @@ cdef class FMRegressor(object):
 
         cdef int [:] indptr = X.indptr
         cdef int [:] indices = X.indices
-        print(X.data.dtype)
         cdef double [:] data = X.data
         num_preds = X.shape[0]
         preds = self._predict(&indptr[0], &indices[0], &data[0], num_preds)
