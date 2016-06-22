@@ -1,6 +1,6 @@
 #LMFM
 
-A factorisation machine written in cython, trained using Alternating Least Squares and sklearn compatible!
+A factorisation machine written in cython, trained using Alternating Least Squares and sklearn compatible! Also recently added support for classification with LMFMClassifier, although I haven't tested it very much yet so there could be issues.
 
 #Installation
 ```pip install lmfm```
